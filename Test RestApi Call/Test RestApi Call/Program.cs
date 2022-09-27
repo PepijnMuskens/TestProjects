@@ -16,32 +16,9 @@ string broeinestid = "3lGbluNj94x8A7b3NFieiy";
 string lamp1 = "3v4kD62VpTAHAmMFW536hQ";
 string lamp2 = "4ErkQXvRN0b1aFS1z5Mi8t";
 
+//FadeLight(lamp1);
+Reset();
 
-//Reset();
-
-int[] Color = new int[] { 255, 0, 0 };
-for(int i = 0; i < 3; i++)
-{
-    int x = i + 1;
-    if (x == 3) x = 0;
-    
-    for(int j = 0; j <= 255; j = j + 5)
-    {
-        Thread.Sleep(1000);
-        Color[x] = j;
-        ChangeColor(lamp1, Color);
-    }
-    token = getToken();
-    for (int j = 255; j >= 0; j = j -5)
-    {
-        Thread.Sleep(1000);
-        Color[i] = j;
-        ChangeColor(lamp1, Color);
-    }
-    token = getToken();
-
-
-}
 
 //Console.WriteLine(GetAsset(lamp1));
 //Console.WriteLine( "\n" + GetAsset(lamp2));
@@ -106,6 +83,31 @@ void TurnOff(string assetid)
     return;
 }
 
+void FadeLight(string assetid)
+{
+
+    int[] Color = new int[] { 255, 0, 0 };
+    for (int i = 0; i < 3; i++)
+    {
+        int x = i + 1;
+        if (x == 3) x = 0;
+
+        for (int j = 0; j <= 255; j = j + 5)
+        {
+            Thread.Sleep(1000);
+            Color[x] = j;
+            ChangeColor(assetid, Color);
+        }
+        token = getToken();
+        for (int j = 255; j >= 0; j = j - 5)
+        {
+            Thread.Sleep(1000);
+            Color[i] = j;
+            ChangeColor(assetid, Color);
+        }
+        token = getToken();
+    }
+}
 void Reset()
 {
     TurnOff(broeinestid);
