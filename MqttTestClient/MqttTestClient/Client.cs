@@ -6,6 +6,9 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MqttTestClient
 {
@@ -23,8 +26,18 @@ namespace MqttTestClient
 
         private static Task Client_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs arg)
         {
-            Console.WriteLine("Received = " + Encoding.UTF8.GetString(arg.ApplicationMessage.Payload) + " on topic " + arg.ApplicationMessage.Topic);
-            return Task.CompletedTask;
+            //Console.WriteLine("Received = " + Encoding.UTF8.GetString(arg.ApplicationMessage.Payload) + " on topic " + arg.ApplicationMessage.Topic);
+            JObject jObject = JObject.Parse(Encoding.Default.GetString(arg.ApplicationMessage.Payload));
+            
+            if (jObject != null)
+            {
+                string test = jObject["attributeState"]["ref"]["name"].ToString();
+                if ("colourRgbLed" == test)
+                {
+                    Console.WriteLine(jObject["attributeState"]["value"].ToString());
+                }
+            }
+                return Task.CompletedTask;
         }
 
         public async Task Connect()
@@ -35,19 +48,22 @@ namespace MqttTestClient
                 .WithCredentials("strijp:fontys", "TsuunSkVxfmSvkDOXpaBQygcW6Lpn8RN")
                 .WithCleanSession()
                 .WithTls(new MqttClientOptionsBuilderTlsParameters()
-                    {
-                        UseTls = true,
-                        SslProtocol = System.Security.Authentication.SslProtocols.Tls12,
-                        Certificates = new List<X509Certificate>()
-                    })
+                {
+                    UseTls = true,
+                    SslProtocol = System.Security.Authentication.SslProtocols.Tls12
+                    //Certificates = new List<X509Certificate>()
+                })
                 .Build();
             await client.ConnectAsync(options);
+            Console.WriteLine(client.IsConnected);
+        }
+
+        public async Task Subscribe(string assetid)
+        {
             var topicFilter = new MqttTopicFilterBuilder()
-                .WithTopic("strijp/" + id + "/asset/3v4kD62VpTAHAmMFW536hQ")
-                .Build();
-            Console.WriteLine("connected");
+               .WithTopic("strijp/" + id + "/attribute/+/" + assetid)
+               .Build();
             await client.SubscribeAsync(topicFilter);
-            Console.WriteLine("subscribed");
         }
     }
 }

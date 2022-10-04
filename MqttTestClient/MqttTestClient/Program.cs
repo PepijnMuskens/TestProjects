@@ -13,7 +13,7 @@ namespace MqttTestClient
         {
             Client client = new Client();
             await client.Connect();
-
+            await client.Subscribe("3v4kD62VpTAHAmMFW536hQ");
             Console.ReadLine();
            
         }
