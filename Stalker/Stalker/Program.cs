@@ -38,6 +38,12 @@ namespace Stalker
                         Console.WriteLine("Enter a valid number");
                     }
                 }
+                else if(text == "3")
+                {
+                    double lon = myLocation.natlabcoordinets[0];
+                    double lat = myLocation.natlabcoordinets[1];
+                    Console.WriteLine("Angle: " + myLocation.CalculateAngle(lon, lat, lon + 1, lat + 1).ToString());
+                }
                 else if(myLocation.url != "")
                 {
                     ProcessStartInfo psi = new ProcessStartInfo(myLocation.url);
@@ -61,7 +67,7 @@ namespace Stalker
     {
         GeoCoordinateWatcher watcher;
         public string url = "";
-        double[] natlabcoordinets = { 51.4444723, 5.4562081};
+        public double[] natlabcoordinets = { 51.4444723, 5.4562081};
         public void GetLocationEvent()
         {  
             this.watcher = new GeoCoordinateWatcher();
@@ -119,6 +125,23 @@ namespace Stalker
             return d * 1000;
         }
 
+        public int CalculateAngle(double lon1 , double lat1, double lon2, double lat2)
+        {
+            double angle = -400;
+            double aanliggend = lat2 - lat1;
+            double overstaand = lon2 - lon1;
+            angle = Math.Atan(overstaand / aanliggend) * 180 / Math.PI;
+            if (lat1 <= lat2)
+            {
+                if(angle < 0)  angle += 360;
+            }
+            else
+            {
+                angle += 180;
+            }
+
+            return (int)angle;
+        }
         
     }
 }
