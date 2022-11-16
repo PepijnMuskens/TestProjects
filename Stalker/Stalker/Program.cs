@@ -20,7 +20,7 @@ namespace Stalker
             myLocation.GetLocationEvent();
             GeoCoordinate geoCoordinate = new GeoCoordinate();
             Console.WriteLine("Enter 1 to quit.");
-            Process p = new Process();
+            
             while (true)
             {
                 string text = Console.ReadLine();
@@ -46,6 +46,7 @@ namespace Stalker
                 }
                 else if(myLocation.url != "")
                 {
+                    Process p = new Process();
                     ProcessStartInfo psi = new ProcessStartInfo(myLocation.url);
                     p.StartInfo = psi;
                     p.Start();
