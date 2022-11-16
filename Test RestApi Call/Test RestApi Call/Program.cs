@@ -9,7 +9,10 @@ using System.Text;
 using System.Globalization;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+<<<<<<< HEAD
 using Newtonsoft.Json;
+=======
+>>>>>>> 0a2e8f445cee5dd6e862eb667ec121347dc2c2ea
 
 int requests = 0;
 Stopwatch Stopwatch = new Stopwatch();
@@ -42,6 +45,7 @@ string O6028 = "6F1eDFmy5CQW9NFiM7JDSJ";
 string W6028 = "76oDMkuQEqM90lYy2eskyv";
 
 string[] lights = { O6021, O6022, O6023, N6024, N6025, O6026, O6027, O6028 };
+<<<<<<< HEAD
 
 
 int[] color = { 255, 0, 0 };
@@ -60,6 +64,14 @@ while (true)
 //Reset();
 //FadeAllLights(lights, new int[] { 255, 0, 0 });
 
+=======
+
+
+//ChangeColor(O6021, new int[] { 0, 0, 0 });
+Reset();
+//FadeAllLights(lights, new int[] { 255, 0, 0 });
+
+>>>>>>> 0a2e8f445cee5dd6e862eb667ec121347dc2c2ea
 //FadeLight(lights[0]);
 //Reset();
 void FadeAllLights(string[] lights, int[] color)
@@ -123,6 +135,7 @@ async void ChangeColor(string assetid, int[] color)
     request.AddBody(color);
     request.AddHeader("authorization", "Bearer " + token);
     client.ExecuteAsync(request);
+<<<<<<< HEAD
     return;
 }
 
@@ -134,6 +147,8 @@ void SetWarmBrightness(string assetid, int brightness)
     request.AddBody(brightness);
     request.AddHeader("authorization", "Bearer " + token);
     Console.WriteLine(client.Execute(request).Content);
+=======
+>>>>>>> 0a2e8f445cee5dd6e862eb667ec121347dc2c2ea
     return;
 }
 
@@ -205,7 +220,11 @@ int[] offset(int[] color, int offset)
             if (after == color.Length) after = 0;
             if (before == -1) before = color.Length -1;
 
+<<<<<<< HEAD
             if (color[before] == 0 && color[after] <= color[i])
+=======
+            if (color[before] == 0 && color[after] < color[i])
+>>>>>>> 0a2e8f445cee5dd6e862eb667ec121347dc2c2ea
             {
                 color[after] += offset;
                 if (color[after] > 255)
@@ -217,7 +236,11 @@ int[] offset(int[] color, int offset)
             else
             {
                 color[before] -= offset;
+<<<<<<< HEAD
                 if (color[before] <= 0)
+=======
+                if (color[before] < 0)
+>>>>>>> 0a2e8f445cee5dd6e862eb667ec121347dc2c2ea
                 {
                     color[after] -= color[before];
                     color[before] = 0;
