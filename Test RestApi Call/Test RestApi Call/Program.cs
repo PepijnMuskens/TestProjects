@@ -9,6 +9,7 @@ using System.Text;
 using System.Globalization;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 
 int requests = 0;
 Stopwatch Stopwatch = new Stopwatch();
@@ -42,7 +43,19 @@ string W6028 = "76oDMkuQEqM90lYy2eskyv";
 
 string[] lights = { O6021, O6022, O6023, N6024, N6025, O6026, O6027, O6028 };
 
-GetAsset(O6021);
+
+int[] color = { 255, 0, 0 };
+
+while (true)
+{
+    offset(color, 151);
+    Console.WriteLine($"R:{color[0]}  G:{color[1]}   B:{color[2]}");
+    Console.ReadKey();
+}
+
+//Console.WriteLine(GetAsset(O6021));
+//SetColdBrightness(O6021,30);
+//SetWarmBrightness(O6021,30);
 //ChangeColor(O6021, new int[] { 0, 0, 0 });
 //Reset();
 //FadeAllLights(lights, new int[] { 255, 0, 0 });
@@ -89,6 +102,16 @@ string GetAsset(string assetid)
     request.Method = Method.Get;
     request.AddHeader("authorization", "Bearer " + token);
     RestResponse response = client.Execute(request);
+    try
+    {
+        LightModel lightModel = JsonConvert.DeserializeObject<LightModel>(response.Content);
+        
+
+    }
+    catch
+    {
+
+    }
     return response.Content.ToString();
 }
 
@@ -103,6 +126,27 @@ async void ChangeColor(string assetid, int[] color)
     return;
 }
 
+void SetWarmBrightness(string assetid, int brightness)
+{
+    var client = new RestClient(url + "/api/" + realm + "/asset/" + assetid + "/attribute/brightnessWhiteWarmLed");
+    var request = new RestRequest();
+    request.Method = Method.Put;
+    request.AddBody(brightness);
+    request.AddHeader("authorization", "Bearer " + token);
+    Console.WriteLine(client.Execute(request).Content);
+    return;
+}
+
+void SetColdBrightness(string assetid, int brightness)
+{
+    var client = new RestClient(url + "/api/" + realm + "/asset/" + assetid + "/attribute/brightnessWhiteColdLed");
+    var request = new RestRequest();
+    request.Method = Method.Put;
+    request.AddBody(brightness);
+    request.AddHeader("authorization", "Bearer " + token);
+    Console.WriteLine(client.Execute(request).Content);
+    return;
+}
 void TurnOn(string assetid)
 {
     var client = new RestClient(url + "/api/" + realm + "/asset/" + assetid + "/attribute/onOff");
@@ -161,7 +205,7 @@ int[] offset(int[] color, int offset)
             if (after == color.Length) after = 0;
             if (before == -1) before = color.Length -1;
 
-            if (color[before] == 0 && color[after] < color[i])
+            if (color[before] == 0 && color[after] <= color[i])
             {
                 color[after] += offset;
                 if (color[after] > 255)
@@ -173,7 +217,7 @@ int[] offset(int[] color, int offset)
             else
             {
                 color[before] -= offset;
-                if (color[before] < 0)
+                if (color[before] <= 0)
                 {
                     color[after] -= color[before];
                     color[before] = 0;
