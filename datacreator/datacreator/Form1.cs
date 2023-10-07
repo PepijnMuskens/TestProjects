@@ -182,6 +182,52 @@ namespace datacreator
 
 
         }
+        private void DrawAIValues(Attribute attribute)
+        {
+            List<Datapoint> points = attribute.DataSet.datapoints;
+            chart1.Series.Remove(chart1.Series.FindByName("AITrue"));
+            chart1.Series.Remove(chart1.Series.FindByName("AIFalse"));
+            chart1.Series.Add("AITrue");
+            chart1.Series.Add("AIFalse");
+            var AItrue = chart1.Series["AITrue"];
+            var AIFalse = chart1.Series["AIFalse"];
+            AItrue.ChartType = SeriesChartType.Point;
+            AItrue.MarkerColor = Color.Green;
+            AItrue.MarkerStyle = MarkerStyle.Circle;
+            AItrue.MarkerSize = 4;
+
+            AIFalse.ChartType = SeriesChartType.Point;
+            AIFalse.MarkerColor = Color.Red;
+            AIFalse.MarkerStyle = MarkerStyle.Circle;
+            AIFalse.MarkerSize = 4;
+
+            double minvalue = int.MaxValue;
+            double maxvalue = int.MinValue;
+            foreach (Datapoint item in points)
+            {
+                if (minvalue > item.value) minvalue = item.value;
+                if (maxvalue < item.value) maxvalue = item.value;
+            }
+            double valrange = maxvalue - minvalue;
+            int pointsPTimestamp = 10;
+            valrange = valrange / pointsPTimestamp;
+            for (int i = points[0].timestamp; i <= points[points.Count - 1].timestamp; i += (points[points.Count - 1].timestamp - points[0].timestamp) / (points.Count -1))
+            {
+                for(double v = minvalue - valrange*3; v < maxvalue + valrange * 3; v+= valrange)
+                {
+                    double[] outputs = neuralNetwork.CalculateOutputs(new double[] { i, v });
+                    if (outputs[0] > outputs[1])
+                    {
+                        AItrue.Points.Add(new DataPoint(i, v));
+                    }
+                    else if(outputs[0] < outputs[1])
+                    {
+                        AItrue.Points.Add(new DataPoint(i, v));
+                    }
+                }
+                
+            }
+        }
 
         private void chart1_Click(object sender, EventArgs e)
         {
@@ -190,31 +236,37 @@ namespace datacreator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+            Random random = new Random();
+
             switch (datatype)
             {
                 case Datatype.Wave:
-                    DataPointnetwork[] dataPointnetwork = new DataPointnetwork[Attributes[0].DataSet.datapoints.Count];
+                    DataPointnetwork[] dataPointnetwork = new DataPointnetwork[Attributes[0].DataSet.datapoints.Count*2];
                     for(int i =0; i < Attributes[0].DataSet.datapoints.Count;i++)
                     {
-                        dataPointnetwork[i] = new DataPointnetwork(new double[] { Attributes[0].DataSet.datapoints[i].timestamp, Attributes[0].DataSet.datapoints[i].value },0,2);
+                            dataPointnetwork[i] = new DataPointnetwork(new double[] { Attributes[0].DataSet.datapoints[i].timestamp, Attributes[0].DataSet.datapoints[i].value }, 0, 2);
+                    }
+                    for (int i = 0; i < Attributes[0].DataSet.datapoints.Count; i++)
+                    {
+
+                        //false
+                        if (random.Next(1, 3) == 1)
+                        {
+                            dataPointnetwork[Attributes[0].DataSet.datapoints.Count + i] = new DataPointnetwork(new double[] { Attributes[0].DataSet.datapoints[i].timestamp, Attributes[0].DataSet.datapoints[i].value + random.Next(3, 7) }, 1, 2);
+                        }
+                        else
+                        {
+                            dataPointnetwork[Attributes[0].DataSet.datapoints.Count + i] = new DataPointnetwork(new double[] { Attributes[0].DataSet.datapoints[i].timestamp, Attributes[0].DataSet.datapoints[i].value + random.Next(-6, -2) }, 1, 2);
+                        }
+                            
+
                     }
                     Stopwatch s = Stopwatch.StartNew();
-                    while (s.ElapsedMilliseconds < 1000)
+                    while (s.ElapsedMilliseconds < 10000)
                     {
                         neuralNetwork.Learn(dataPointnetwork, 1);
                     }
-                    neuralNetwork.Learn(dataPointnetwork, 1);
-                    Attribute att = new Attribute("Validation");
-                    for (int i = 0; i < Attributes[0].DataSet.datapoints.Count; i++)
-                    {
-                        double[] values = neuralNetwork.CalculateOutputs(new double[] { Attributes[0].DataSet.datapoints[i].timestamp, Attributes[0].DataSet.datapoints[i].value});
-                        double val;
-                        if (values[0] > values[1]) val = values[0];
-                        else val = values[1]*-1;
-                        att.DataSet.datapoints.Add(new Datapoint(Attributes[0].DataSet.datapoints[i].timestamp, val));
-                    }
-                    DrawAttribute(att);
+                    DrawAIValues(Attributes[0]);
                     
                     break;
                 case Datatype.Random:

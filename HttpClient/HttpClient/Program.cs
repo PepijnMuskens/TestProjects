@@ -12,10 +12,8 @@ namespace HttpClientTest
 {
     internal class Program
     {
-        private static string url = "https://staging.strijp.openremote.app";
-        private static string realm = "strijp";
+        private static string url = "";
         private static string sectret = "TsuunSkVxfmSvkDOXpaBQygcW6Lpn8RN";
-        private static string client_id = "fontys";
         private static bool wait = true;
 
         static void Main(string[] args)

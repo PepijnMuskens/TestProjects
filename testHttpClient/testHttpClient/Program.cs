@@ -13,32 +13,73 @@ namespace testHttpClient
     internal class Program
     {
 
-        private static string url = "https://staging.strijp.openremote.app";
-        private static string realm = "strijp";
-        private static string sectret = "TsuunSkVxfmSvkDOXpaBQygcW6Lpn8RN";
-        private static string client_id = "fontys";
-
+        private static string url = "https://api.pubg.com/shards/steam/";
+        private static string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmOGZhN2NlMC1hNTk5LTAxM2ItMGFiYS02ZDdmOTc3MzllOTciLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNjc4OTEwNDM1LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6Ii02NjdhOTcwNC02Y2ZiLTQ1ZjYtYmE0OS0yN2UyNzI2NzIyMGEifQ.dbXPKz-5Wml2Lpf9KRYUo6G8GyQzqNPqKeDEp6Uvmoc";
 
         static void Main(string[] args)
         {
-            Console.WriteLine(getToken());
+            //Console.WriteLine(getplayerid("P1PP1N001"));
+            Console.WriteLine(GetMatchStats("405050b1-6a5f-4b89-ada4-1159406b1973"));
             Console.ReadKey();
         }
 
 
-        private static string getToken()
+        private static string getplayerid(string name)
         {
-            var client = new RestClient(url + "/auth/realms/" + realm + "/protocol/openid-connect/token");
+            var client = new RestClient(url + "players?filter[playerNames]=P1PP1N001");
             var request = new RestRequest();
-            request.Method = Method.Post;
-            request.AddHeader("cache-control", "no-cache");
-            request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            request.AddParameter("application/x-www-form-urlencoded", "grant_type=client_credentials&client_id=" + client_id + "&client_secret=" + sectret, ParameterType.RequestBody);
+            request.Method = Method.Get;
+            request.AddHeader("authorization", "Bearer " + token);
+            request.AddHeader("Accept", "application/vnd.api+json");
             RestResponse response = client.Execute(request);
             string content = response.Content.ToString();
-            string[] p = content.Split(':');
-            p = p[1].Split(',');
-            return p[0].Split('"')[1];
+            return content;
+        }
+
+        private static string GetWeaponStats()
+        {
+            var client = new RestClient(url+ "players/account.d1fa5d0376484529aeff0c893c6b0bbd/weapon_mastery");
+            var request = new RestRequest();
+            request.Method = Method.Get;
+            request.AddHeader("authorization", "Bearer " + token);
+            request.AddHeader("Accept", "application/vnd.api+json");
+            RestResponse response = client.Execute(request);
+            string content = response.Content.ToString();
+            return content;
+        }
+        private static string GetMatchStats(string id)
+        {
+            var client = new RestClient(url + "matches/" + id);
+            var request = new RestRequest();
+            request.Method = Method.Get;
+            request.AddHeader("authorization", "Bearer " + token);
+            request.AddHeader("Accept", "application/vnd.api+json");
+            RestResponse response = client.Execute(request);
+            string content = response.Content.ToString();
+            return content;
+        }
+
+        private static string GetSeasonStats()
+        {
+            var client = new RestClient(url + "players/account.d1fa5d0376484529aeff0c893c6b0bbd/seasons/division.bro.official.pc-2018-20");
+            var request = new RestRequest();
+            request.Method = Method.Get;
+            request.AddHeader("authorization", "Bearer " + token);
+            request.AddHeader("Accept", "application/vnd.api+json");
+            RestResponse response = client.Execute(request);
+            string content = response.Content.ToString();
+            return content;
+        }
+        private static string GetSeasons()
+        {
+            var client = new RestClient(url + "seasons");
+            var request = new RestRequest();
+            request.Method = Method.Get;
+            request.AddHeader("authorization", "Bearer " + token);
+            request.AddHeader("Accept", "application/vnd.api+json");
+            RestResponse response = client.Execute(request);
+            string content = response.Content.ToString();
+            return content;
         }
     }
 }
